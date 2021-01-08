@@ -21,7 +21,7 @@ def poruke(req):
     tmp = Poruka.objects.all()
     if req.method == 'POST':
         form = PorukaForm(req.POST)
-        
+
         if form.is_valid():
             a = Poruka(content=form.cleaned_data['content'], owner=req.user)
             a.save()
@@ -33,3 +33,12 @@ def poruke(req):
     else:
         form = PorukaForm()
         return render(req, 'hello.html', {'poruke': tmp,'form': form})
+
+@login_required
+def delete(req, id):
+    if not req.user.is_superuser and not isinstance(id,int):
+        redirect('proj2_app:poruke')
+    else:
+        p = Poruka.objects.get(id=id)
+        p.delete()
+        return redirect('proj2_app:poruke')
