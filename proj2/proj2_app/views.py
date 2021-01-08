@@ -21,7 +21,7 @@ def poruke(req):
     tmp = Poruka.objects.all()
     if req.method == 'POST':
         form = PorukaForm(req.POST)
-
+        
         if form.is_valid():
             a = Poruka(content=form.cleaned_data['content'], owner=req.user)
             a.save()
