@@ -1,13 +1,51 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from .models import Poruka
+from .forms import PorukaForm
 
 # Create your views here.
 
-def index(requset):
-    if not requset.user.is_authenticated:
-        return render(requset, 'index.html')
+def index(req):
+    if not req.user.is_authenticated:
+        return render(req, 'index.html')
     else:
-        return render(requset, 'hello.html')
+        return redirect('proj2_app:hello')
 
-def hello(requset):
-    return render(requset, 'hello.html')
+@login_required
+def hello(req):
+    #return render(req, 'hello.html')
+    return redirect('proj2_app:poruke')
+
+@login_required
+def poruke(req):
+    tmp = Poruka.objects.all()
+    if req.method == 'POST':
+        form = PorukaForm(req.POST)
+
+        if form.is_valid():
+            a = Poruka(content=form.cleaned_data['content'], owner=req.user)
+            a.save()
+            tmp = Poruka.objects.all()
+            form = PorukaForm()
+            return render(req, 'hello.html', {'poruke': tmp,'form':form})
+        else:
+            return render(req, 'hello.html', {'poruke': tmp,'form':form})
+    else:
+        form = PorukaForm()
+        return render(req, 'hello.html', {'poruke': tmp,'form': form})
+
+
+@login_required
+def new(req):
+    if req.method == 'POST':
+        form = PorukaForm(req.POST)
+
+        if form.is_valid():
+            a = Poruka(content=form.cleaned_data['content'], owner=req.user)
+            a.save()
+            return redirect('proj2_app:poruke')
+        else:
+            return render(req, 'new.html', {'form': form})
+    else:
+        form = PorukaForm()
+        return render(req, 'new.html', {'form': form})
