@@ -33,19 +33,3 @@ def poruke(req):
     else:
         form = PorukaForm()
         return render(req, 'hello.html', {'poruke': tmp,'form': form})
-
-
-@login_required
-def new(req):
-    if req.method == 'POST':
-        form = PorukaForm(req.POST)
-
-        if form.is_valid():
-            a = Poruka(content=form.cleaned_data['content'], owner=req.user)
-            a.save()
-            return redirect('proj2_app:poruke')
-        else:
-            return render(req, 'new.html', {'form': form})
-    else:
-        form = PorukaForm()
-        return render(req, 'new.html', {'form': form})
